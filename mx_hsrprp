@@ -1,0 +1,78 @@
+#!/bin/sh
+
+# mx_hsrprp   Start/Stop the, collect Ethernet counters, link status, link speed daemon.
+# chkconfig: 2345 90 60
+# description: Moxa HSR/PRP card status daemon
+# 
+### BEGIN INIT INFO
+# Provides:		mxhsrprpd
+# Required-Start:	$remote_fs $syslog
+# Required-Stop:	$remote_fs $syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	Moxa HSR/PRP card status daemon
+### END INIT INFO
+
+#set -e
+
+umask 022
+
+# The time sync daemon default configure wtih
+#   -B - Run daemon in the background
+#   -t: HSR/PRP Status update period. Unit per second.
+#   -b: SMBUS device, default is /dev/i2c-0
+#   -m: configure to prp or hsr mode, default is prp mode.
+#       The argurement is [index]:[mode]
+#       index range from 0~7, mode 0 is prp, mode 1 is hsr.
+#       Ex: Set card 0 to hsr mode, card 1 to prp mode.
+#
+MX_PRP_OPTS="-t 2 -B"
+
+export PATH="${PATH:+$PATH:}/usr/local/bin:/sbin"
+
+load_i2cdev_driver() {
+
+	if [ "`lsmod|grep -c i2c_dev`" = "0" ]; then
+		# If the driver has not been loaded, load it
+		modprobe i2c_dev
+	fi
+
+	if [ "`lsmod|grep -c i2c_i801`" = "0" ]; then
+		# If the driver has not been loaded, load it
+		modprobe i2c_i801
+	fi
+}
+
+case "$1" in
+  start)
+
+	load_i2cdev_driver
+
+	if [ -e "/var/run/mxhsrprpd.pid" ]; then
+		echo "The mxhsrprpd is running. You cannot run it twice."
+	else
+		default_bus="/dev/i2c-0"
+		for smbus in $(ls /sys/bus/i2c/devices/); do
+			smbus_name=$(cat /sys/bus/i2c/devices/$smbus/name | grep I801)
+			if [ x"$smbus_name" != x"" ]; then
+				default_bus=$(echo /dev/$smbus)
+				break
+			fi
+		done
+		/usr/sbin/mxhsrprpd -b $default_bus $MX_PRP_OPTS > /dev/null 2>&1
+	fi
+	;;
+  stop)
+	if [ -e "/var/run/mxhsrprpd.pid" ]; then
+		pkill -F  /var/run/mxhsrprpd.pid
+		rm -rf /var/run/mxhsrprpd.pid
+	fi
+	;;
+  restart)
+	$0 stop
+	sleep 5
+	$0 start
+	;;
+esac
+
+exit 0

@@ -1,0 +1,5 @@
+moxa-hsrprp-tools (1.0.0+deb9) stretch; urgency=low
+
+  * Initial release.
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Thu, 01 Nov 2018 18:25:51 +0800

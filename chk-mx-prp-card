@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# This program use to show Moxa HSR/PRP card interface name and pci bus id
+#
+#
+
+
+printf "Searching Moxa HSR/PRP card...\n"
+for pciid in $(ls /sys/bus/pci/devices/); do
+	SUBVEN=$(cat /sys/bus/pci/devices/$pciid/subsystem_vendor)
+	if [ x"0x1393" = x"$SUBVEN" ]; then
+		NETNAME=$(ls /sys/bus/pci/devices/$pciid/net)
+		if [ x"$NETNAME" != x"" ]; then
+			printf "$NETNAME - pcibus id is $pciid\n"
+		fi
+	fi
+done
+
+

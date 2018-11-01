@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# This shell script will call by mxhsrprpd.
+# You can design custom action in this script. Please search 'TODO'
+#
+# $1 - Card index, 0~7.
+# $2 - Event name
+#          li: inter link status
+#          la: lan A link stattus
+#          lb: lab B link status
+# $3 - Event argument
+#
+
+IS_DA720=$(cat /sys/class/dmi/id/product_name | grep "DA-720")
+
+function run_alarm_link_down()
+{
+	echo "Card $1 $2 Link down"
+	#
+	# Relay trig
+	#if [ x"$IS_DA720" != x"" ]; then
+	#	echo 0 >/sys/class/gpio/relay1/value
+	#fi
+	#
+
+	#
+	# Snmp trap example, for more information man snmptrap
+	# snmptrap -v 2c -c $SNMPTRAP_COMMUNITY $SNMPTRAP_IP "" $ALERT_OID $ALERT_SRC_OID i 0 1>/dev/null 2>/dev/null
+	#
+
+	#
+	# Sendmail example, the pop/smtp server should be configured first. For more information man mutt
+	# mutt -s "Card $1 $2 Link down" user@example.com </dev/null
+	#
+
+	#
+	# For the other Relay/Alarm device, Ex: Moxa iologik series.
+	#
+}
+
+function run_alarm_link_up()
+{
+echo "Card $1 $2 Link up"
+	#
+	# Relay trig
+	#if [ x"$IS_DA720" != x"" ]; then
+	#	echo 1 >/sys/class/gpio/relay1/value
+	#fi
+	#
+
+	#
+	# Snmp trap, for more information man snmptrap
+	# snmptrap -v 2c -c $SNMPTRAP_COMMUNITY $SNMPTRAP_IP "" $ALERT_OID $ALERT_SRC_OID i 0 1>/dev/null 2>/dev/null
+	#
+
+	#
+	# Sendmail, the pop/smtp server should be configured first. For more information man mutt
+	# mutt -s "Card $1 $2 Link up" user@example.com </dev/null
+	#
+
+	#
+	# For the other Relay/Alarm device, Ex: Moxa iologik series.
+	#
+}
+
+
+#
+# Process inter link status event
+#
+if [ x"$2" = x"li" ]; then
+	#TODO: do something when event occur
+	if [ x"$3" = x"0" ]; then
+		run_alarm_link_down $1 "Interlink"
+	elif [ x"$3" = x"1" ]; then
+		run_alarm_link_up $1 "Interlink"
+	fi
+elif [ x"$2" = x"la" ]; then
+#
+# Process Lan A link status event
+#
+	#TODO: do something when event occur
+	if [ x"$3" = x"0" ]; then
+		run_alarm_link_down $1 "LAN A"
+	elif [ x"$3" = x"1" ]; then
+		run_alarm_link_up $1 "LAN A"
+	fi
+elif [ x"$2" = x"lb" ]; then
+#
+# Process Lan B link status event
+#
+	#TODO: do something when event occur
+	if [ x"$3" = x"0" ]; then
+		run_alarm_link_down $1 "LAN B"
+	elif [ x"$3" = x"1" ]; then
+		run_alarm_link_up $1 "LAN B"
+	fi
+fi
+
+
