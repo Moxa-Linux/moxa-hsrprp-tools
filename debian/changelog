@@ -1,3 +1,9 @@
+moxa-hsrprp-tools (1.0.1+deb9) stretch; urgency=low
+
+  * fix: update files location for debian package
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 12 Mar 2019 14:17:46 +0800
+
 moxa-hsrprp-tools (1.0.0+deb9) stretch; urgency=low
 
   * Initial release.
