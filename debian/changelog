@@ -1,3 +1,10 @@
+moxa-hsrprp-tools (1.0.2+deb9) stretch; urgency=low
+
+  * fix: update device ID due to phy chip changed
+  * fix: fix build warnings
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 28 May 2019 13:44:30 +0800
+
 moxa-hsrprp-tools (1.0.1+deb9) stretch; urgency=low
 
   * fix: update files location for debian package
