@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/stat.h>
 #include <linux/i2c-dev.h>
 #include "mxhsrprp.h"
 
