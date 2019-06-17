@@ -7,9 +7,9 @@
 printf "Searching Moxa HSR/PRP card...\n"
 for pciid in $(ls /sys/bus/pci/devices/); do
 	DEVID=$(cat /sys/bus/pci/devices/$pciid/device)
-	if [ x"0x10d3" = x"$DEVID" ]; then
+	if [ "0x10d3" = "$DEVID" ]; then
 		NETNAME=$(ls /sys/bus/pci/devices/$pciid/net)
-		if [ x"$NETNAME" != x"" ]; then
+		if [ "$NETNAME" != "" ]; then
 			printf "$NETNAME - pcibus id is $pciid\n"
 		fi
 	fi
