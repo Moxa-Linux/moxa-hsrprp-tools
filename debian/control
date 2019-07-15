@@ -10,6 +10,6 @@ Homepage: https://www.moxa.com/
 Package: moxa-hsrprp-tools
 Architecture: any
 Depends: ${misc:Depends},
-         libi2c-dev
+         ${shlibs:Depends}
 Description: Utility for controlling DA-PRP-HSR expansion module
  It contains the necessary tools for setting up DA-PRP-HSR
