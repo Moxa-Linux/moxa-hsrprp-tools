@@ -28,7 +28,7 @@
 #define DEFAULT_PRP_UPDATE_PERIOD_SEC	2
 #define DEFAULT_SMBUS_DEV_PATH		"/dev/i2c-0"
 #define PIDFILE				"/var/run/mxhsrprpd.pid"
-#define ALARM_EXEC_FILE			"/usr/local/bin/mxprpalarm"
+#define ALARM_EXEC_FILE			"/usr/sbin/mxprpalarm"
 
 /* Used to control the daemon running. 0 for running, else for running */
 int bStopping = 0;
