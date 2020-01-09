@@ -43,8 +43,7 @@ void usage(void)
 \n\t    Default is %d second.\n", DEFAULT_UPDATE_PERIOD_SEC);
 	printf("\t-m: send HSR or PRP supervision frame mode.\
 \n\t    0 is PRP; 1 is HSR. Default is %d.\n", DEFAULT_PRP_MODE);
-	printf("\t-i: interface name, Ex.: eth0.\n");
-	printf("\t    Execute chk-mx-prp-card to list supported interface.\n");
+	printf("\t-i: interface name, Ex.: eth0 or enp4s0\n");
 	printf("\t-a: Destination MAC address last byte.\
 \n\t    The range is 00~FF. Default is 00\n");
 	printf("\n\n");

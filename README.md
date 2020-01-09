@@ -13,7 +13,6 @@ MOXA HSR/PRP card utility base on SMBUS to query FPGA related register.
 	mxhsrprpd	- Configure hsr/prp mode, collect Ethernet counters, link status, link speed
 	mxprpsuper	- Send PRP/HSR supervison frame.
 	mxprpinfo	- Get current hsr/prp mode, collect Ethernet counters, link status, link speed. Depends on mxhsrprpd
-	chk-mx-prp-card	- Report on board Moxa HSR/PRP card interface name
 	mxprpalarm	- mxhsrprpd will execute this when link status change. This script can be modify by customer.
 ```
 

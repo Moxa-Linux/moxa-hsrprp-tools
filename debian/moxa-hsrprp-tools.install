@@ -1,6 +1,0 @@
-mxhsrprpd /usr/sbin
-mxprpinfo /usr/sbin
-mxprpsuper /usr/sbin
-mxprpalarm /usr/sbin
-chk-mx-prp-card /usr/sbin
-mx_hsrprp /usr/sbin

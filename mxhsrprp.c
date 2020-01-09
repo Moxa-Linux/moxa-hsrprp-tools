@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (C) MOXA Inc. All rights reserved.
  *
  * This software is distributed under the terms of the
@@ -7,8 +6,8 @@
  *
  * Moxa HSR/PRP Card library
  *
- * 2017-09-18 Holsety Chen
- *   new release
+ * 2017-09-18	Holsety Chen	new release
+ * 2020-01-02	Elvis Yao	add support DA-PRP-HSR-I210
  *
  */
 
@@ -216,6 +215,9 @@ typedef union
 #define SPARE_CONTROL_1			0x02
 #define AUTO_DETECT_MEDIUM		0x1E
 #define MODE_CONTROL			0x1F
+
+/* PHY REG 0x18 access */
+#define PHY_ADDR_REG_MII_CONTROL	0x18
 
 /*
  * FPGA GPIO for LED
@@ -464,7 +466,7 @@ int get_gpio_pin_l(int fd, __u8 *data)
 
 int init_card(int fd, int index)
 {
-	__u16 v;
+	__u16 v, reg_read_18h;
 	__u8 major;
 	__u8 minor;
 
@@ -477,12 +479,44 @@ int init_card(int fd, int index)
 		return -1;
 	printf("Card %d FPGA version is %x.%x\n", index, major, minor);
 
+
 	/* Reset all counter */
 	if (write_avalon_reg(fd, AVALON_SLAVE_SELECT_PORT_I, CNT_CTRL, 0x1) < 0)
 		return -1;
 	if (write_avalon_reg(fd, AVALON_SLAVE_SELECT_PORT_A, CNT_CTRL, 0x1) < 0)
 		return -1;
 	if (write_avalon_reg(fd, AVALON_SLAVE_SELECT_PORT_B, CNT_CTRL, 0x1) < 0)
+		return -1;
+
+	/* for reading reg 18h, write reg: bits[2:0]=111, bits[11:3]=dont care, */
+	/* bits[14:12]=shadow_reg(2h), bit 15=0. and read back reg */
+	reg_read_18h = 0x2007;
+	if (write_phy_reg(fd, PHY_ADDR_INTERLINK, PHY_ADDR_REG_MII_CONTROL, reg_read_18h) < 0)
+		return -1;
+	if (read_phy_reg(fd, PHY_ADDR_INTERLINK, PHY_ADDR_REG_MII_CONTROL, &v) < 0)
+		return -1;
+
+	/* If the jumper on DA-PRP-HSR-I210 is enable super isolate (copper only) */
+	/* it's need to set as normal operation mode (bit 5 is 0) to enable auto-nego */
+	/* phy_addr=18h, shadow_reg[2:0]=2h, [5:3]=0h, [6]=1h, [10:7]= Dh, [15:11]=0h */
+	v &= ~(1 << 5);
+	if (write_phy_reg(fd, PHY_ADDR_INTERLINK, PHY_ADDR_REG_MII_CONTROL, v) < 0)
+		return -1;
+
+	if (write_phy_reg(fd, PHY_ADDR_LAN_A, PHY_ADDR_REG_MII_CONTROL, reg_read_18h) < 0)
+		return -1;
+	if (read_phy_reg(fd, PHY_ADDR_LAN_A, PHY_ADDR_REG_MII_CONTROL, &v) < 0)
+		return -1;
+	v &= ~(1 << 5);
+	if (write_phy_reg(fd, PHY_ADDR_LAN_A, PHY_ADDR_REG_MII_CONTROL, v) < 0)
+		return -1;
+
+	if (write_phy_reg(fd, PHY_ADDR_LAN_B, PHY_ADDR_REG_MII_CONTROL, reg_read_18h) < 0)
+		return -1;
+	if (read_phy_reg(fd, PHY_ADDR_LAN_B, PHY_ADDR_REG_MII_CONTROL, &v) < 0)
+		return -1;
+	v &= ~(1 << 5);
+	if (write_phy_reg(fd, PHY_ADDR_LAN_B, PHY_ADDR_REG_MII_CONTROL, v) < 0)
 		return -1;
 
 	/* Configure LEDs */
