@@ -1,3 +1,13 @@
+moxa-hsrprp-tools (1.0.4+deb9) stretch; urgency=low
+
+  * feat: add support DA-PRP-HSR-I210 for disble copper super isolation
+  * fix: to correct mxprpalarm path
+  * feat: add Makefile install function
+  * fix: to disable build dbgsym
+  * refactor: remove chk-mx-prp-card due to phy chip vendors are not fixed
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Thu, 09 Jan 2020 17:06:44 +0800
+
 moxa-hsrprp-tools (1.0.3+deb9) stretch; urgency=low
 
   * fix: replace lib*-dev package by shlibs:Depends on control file
