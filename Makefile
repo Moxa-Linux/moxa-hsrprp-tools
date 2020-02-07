@@ -1,7 +1,5 @@
+DESTDIR ?= /
 CC=gcc
-STRIP=strip
-LFLAGS=-fPIC -shared
-
 CFLAGS = -DPRPLED_HA
 
 all:
@@ -9,18 +7,13 @@ all:
 	@$(CC) mxprpinfo.c -o mxprpinfo
 	@$(CC) prpsuper.c -o mxprpsuper
 
+install:
+	mkdir -p $(DESTDIR)/usr/sbin/
+	cp mxhsrprpd $(DESTDIR)/usr/sbin
+	cp mxprpinfo $(DESTDIR)/usr/sbin
+	cp mxprpsuper $(DESTDIR)/usr/sbin
+
 clean:
 	@rm -f mxhsrprpd
 	@rm -f mxprpinfo
 	@rm -f mxprpsuper
-
-# Remove install section to debian install file
-#install: all
-#	mkdir -p $(DESTDIR)/usr/local/bin
-#	install -m 755 mxhsrprpd $(DESTDIR)/usr/local/bin
-#	install -m 755 mxprpinfo $(DESTDIR)/usr/local/bin
-#	install -m 755 mxprpsuper $(DESTDIR)/usr/local/bin
-#	install -m 755 mxprpalarm $(DESTDIR)/usr/local/bin
-#	install -m 755 chk-mx-prp-card $(DESTDIR)/usr/local/bin
-#	mkdir -p $(DESTDIR)/etc/init.d
-#	install -m 755 mx_prp.sh $(DESTDIR)/etc/init.d
