@@ -57,8 +57,7 @@ struct mxhsrprp_mgr {
 	struct mxprpdev devs[MAX_PRPHSR_CARD];
 };
 
-static void *prpmgr_thread(void *arg)
-{
+static void *prpmgr_thread(void *arg) {
 	int i;
 	struct mxhsrprp_mgr *mgr = arg;
 	int prev_link_i[MAX_PRPHSR_CARD];
@@ -118,9 +117,9 @@ static void *prpmgr_thread(void *arg)
 				get_prp_counters(fd, PORT_I,
 					&mgr->devs[i].counters_i);
 			}
-			if ( mgr->devs[i].link_status_i != prev_link_i[i] ) {
+			if (mgr->devs[i].link_status_i != prev_link_i[i]) {
 				prev_link_i[i] = mgr->devs[i].link_status_i;
-				sprintf(str, "%s %d l`i %d &", ALARM_EXEC_FILE,
+				sprintf(str, "%s %d li %d &", ALARM_EXEC_FILE,
 					i, mgr->devs[i].link_status_i);
 				system(str);
 			}
@@ -133,13 +132,12 @@ static void *prpmgr_thread(void *arg)
 				get_prp_counters(fd, PORT_A,
 					&mgr->devs[i].counters_a);
 			}
-			if ( mgr->devs[i].link_status_a != prev_link_a[i] ) {
+			if (mgr->devs[i].link_status_a != prev_link_a[i]) {
 				prev_link_a[i] = mgr->devs[i].link_status_a;
 				sprintf(str, "%s %d la %d &", ALARM_EXEC_FILE,
 					i, mgr->devs[i].link_status_a);
 				system(str);
 			}
-
 
 			get_link_status(fd, PORT_B,
 				&mgr->devs[i].link_status_b);
@@ -149,7 +147,7 @@ static void *prpmgr_thread(void *arg)
 				get_prp_counters(fd, PORT_B,
 					&mgr->devs[i].counters_b);
 			}
-			if ( mgr->devs[i].link_status_b != prev_link_b[i] ) {
+			if (mgr->devs[i].link_status_b != prev_link_b[i]) {
 				prev_link_b[i] = mgr->devs[i].link_status_b;
 				sprintf(str, "%s %d lb %d &", ALARM_EXEC_FILE,
 					i, mgr->devs[i].link_status_b);
@@ -171,8 +169,7 @@ static void *prpmgr_thread(void *arg)
 }
 
 #define IPC_SOCKET_PATH	"\0mxprpipc"
-static void *prp_status_thread(void *arg)
-{
+static void *prp_status_thread(void *arg) {
 	char *socket_path = IPC_SOCKET_PATH;
 	int i;
 	struct mxhsrprp_mgr *mgr = arg;
@@ -185,7 +182,7 @@ static void *prp_status_thread(void *arg)
 	fd_set set;
 	struct timeval timeout;
 
-	if ( (fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+	if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		perror("socket error");
 		exit(-1);
 	}
@@ -217,13 +214,13 @@ static void *prp_status_thread(void *arg)
 		timeout.tv_sec = 5;
 		timeout.tv_usec = 0;
 
-		rc=select(fd+1,&set, NULL, NULL, &timeout);
-		if ( rc == 0 )
+		rc = select(fd+1, &set, NULL, NULL, &timeout);
+		if (rc == 0)
 			continue;
 		else if (rc < 0)
 			break;
 
-		if ( (cl = accept(fd, NULL, NULL)) == -1) {
+		if ((cl = accept(fd, NULL, NULL)) == -1) {
 			perror("accept error");
 			continue;
 		}
@@ -233,7 +230,7 @@ static void *prp_status_thread(void *arg)
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
 
-		while ( (rc=select(cl+1,&set, NULL, NULL, &timeout)) > 0) {
+		while ((rc=select(cl+1,&set, NULL, NULL, &timeout)) > 0) {
 			char *token;
 			char *parsing[4];
 			char *p;
@@ -242,8 +239,8 @@ static void *prp_status_thread(void *arg)
 			int stidx = 0;
 			int count = MAX_PRPHSR_CARD;
 
-			rc = read( cl, buf, sizeof(buf)-1 );
-			if ( rc <= 0 ) {
+			rc = read(cl, buf, sizeof(buf)-1);
+			if (rc <= 0) {
 				break;
 			}
 			buf[rc] = '\0';
@@ -256,7 +253,7 @@ static void *prp_status_thread(void *arg)
 				parsing[argcnt] = token;
 			}
 
-			if (argcnt >=2 ) {
+			if (argcnt >=2) {
 				stidx = atoi(parsing[1]);
 				count = 1;
 			}
@@ -274,7 +271,7 @@ static void *prp_status_thread(void *arg)
 					p += sprintf(p, "link_status_b:%d\n", mgr->devs[stidx+i].link_status_b);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "get_link_speed") ) {
+			} else if (0 == strcmp( parsing[0], "get_link_speed")) {
 			 	for (i=0; i<count; i++) {
 					if ( mgr->devs[stidx+i].fd < 0)
 						continue;
@@ -287,9 +284,9 @@ static void *prp_status_thread(void *arg)
 					p += sprintf(p, "link_speed_b:%d\n", mgr->devs[stidx+i].link_speed_b);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "get_counters") ) {
+			} else if (0 == strcmp( parsing[0], "get_counters")) {
 			 	for (i=0; i<count; i++) {
-					if ( mgr->devs[stidx+i].fd < 0)
+					if (mgr->devs[stidx+i].fd < 0)
 						continue;
 
 					wbuf[0] = '\0';
@@ -381,7 +378,7 @@ static void *prp_status_thread(void *arg)
 					p += sprintf(p, "early_drop:%ld\n", mgr->devs[stidx+i].counters_b.early_drop);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "get_prp_mode") ) {
+			} else if (0 == strcmp(parsing[0], "get_prp_mode")) {
 			 	for (i=0; i<count; i++) {
 					if (mgr->devs[stidx+i].fd < 0)
 						continue;
@@ -392,7 +389,7 @@ static void *prp_status_thread(void *arg)
 					p += sprintf(p, "mode:%d\n", mgr->devs[stidx+i].mode);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "set_prp_mode") ) {
+			} else if (0 == strcmp(parsing[0], "set_prp_mode")) {
 			 	for (i=0; i<count; i++) {
 					if (mgr->devs[stidx+i].fd < 0)
 						continue;
@@ -407,7 +404,7 @@ static void *prp_status_thread(void *arg)
 						mgr->devs[stidx+i].new_mode);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "set_hsr_mode") ) {
+			} else if (0 == strcmp(parsing[0], "set_hsr_mode")) {
 			 	for (i=0; i<count; i++) {
 					if (mgr->devs[stidx+i].fd < 0)
 						continue;
@@ -422,7 +419,7 @@ static void *prp_status_thread(void *arg)
 						mgr->devs[stidx+i].new_mode);
 					write(cl, wbuf, strlen(wbuf));
 				}
-			} else if (0 == strcmp( parsing[0], "disconnect") ) {
+			} else if (0 == strcmp(parsing[0], "disconnect")) {
 				close(cl);
 				break;
 			} else {
@@ -449,9 +446,8 @@ static void *prp_status_thread(void *arg)
 extern int optind, opterr, optopt;
 extern char *optarg;
 
-int parsing_string( char* source, char **split, char *key, int count )
-{
-	char *pch = strtok(source, key );
+int parsing_string(char* source, char **split, char *key, int count) {
+	char *pch = strtok(source, key);
 	int i;
 
 	for (i = 0; (pch != NULL) && (i < count); i++)
@@ -465,7 +461,6 @@ int parsing_string( char* source, char **split, char *key, int count )
 
 
 int remove_pid_file(const char *pidFile) {
-
 	bStopping = 1;
 
 	if ( unlink(pidFile) < 0 ) {
@@ -481,12 +476,12 @@ int create_pid_file(const char *pidFile) {
 	int fd_pid;
 
 	fd_pid = open(pidFile, O_CREAT|O_TRUNC|O_RDWR);
-	if ( fd_pid < 0 ) {
+	if (fd_pid < 0) {
 		printf("Open %s fail\n", pidFile);
 		return -EEXIST;
 	}
 	sprintf(buf, "%d", getpid());
-	if(write(fd_pid, buf, sizeof(buf)) < 0 ) {
+	if(write(fd_pid, buf, sizeof(buf)) < 0) {
 		printf("Write %s fail\n", pidFile);
 		return -EACCES;
 	}
@@ -497,7 +492,6 @@ int create_pid_file(const char *pidFile) {
 }
 
 void sig_handler_for_stopping_process(int sig) {
-
 	remove_pid_file(PIDFILE);
 }
 
@@ -512,8 +506,8 @@ void usage(void)
 	printf("\t-m: configure to prp or hsr mode, default is prp mode.\n");
 	printf("\t\tThe argurement is [index]:[mode]\n");
 	printf("\t\tindex range from 0~7, mode 0 is prp, mode 1 is hsr.\n");
-	printf("\t\tEx: Set card 0 to hsr mode, card 1 to prp mode.");
-	printf("\t\t\t root@Moxa:~# mxhsrprpd -t 2 -m 0:1,1:0");
+	printf("\t\tEx: Set card 0 to hsr mode, card 1 to prp mode.\n");
+	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -m 0:1,1:0");
 	printf("\n\n");
 }
 
@@ -545,7 +539,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 't':
 			prp_mgr.polling_sec = atoi(optarg);
-			if ( prp_mgr.polling_sec < 0) {
+			if (prp_mgr.polling_sec < 0) {
 				fprintf(stderr, "Bad argument!\n");
 				exit(-1);
 			}
@@ -580,27 +574,27 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* To run in Daemon mode */
-	if ( be_a_daemon ) {
+	if (be_a_daemon) {
 		int pid;
 		int remove_files_signal_list[] = {
 			SIGHUP, SIGINT, SIGQUIT, SIGILL, SIGABRT, SIGFPE,
 			SIGKILL, SIGSEGV, SIGPIPE, SIGALRM, SIGTERM, SIGUSR1,
 			SIGUSR2};
 		pid = fork();
-		if ( pid < 0 ) {
+		if (pid < 0) {
 			return -1;
 		}
-		else if ( pid > 0 ) {
+		else if (pid > 0) {
 			exit(0);
 		}
 
 		/* mew session founder process */
 		setsid();
 		pid = fork();
-		if ( pid < 0 ) {
+		if (pid < 0) {
 			return -1;
 		}
-		else if ( pid > 0 ) {
+		else if (pid > 0) {
 			exit(0);
 		}
 
@@ -609,7 +603,7 @@ int main(int argc, char *argv[]) {
 		umask(0);
 
 		/* Register the signal handler for the pid file removal */
-		for( i=0; i < sizeof(remove_files_signal_list)/sizeof(int); i++ )
+		for (i=0; i < sizeof(remove_files_signal_list)/sizeof(int); i++)
 			signal(remove_files_signal_list[i], sig_handler_for_stopping_process);
 
 		/* Create the child process pid file */
@@ -620,7 +614,7 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < MAX_PRPHSR_CARD; i++) {
 		int fd = open(smbus_dev, O_RDWR);
 
-		if (fd < 0 ) {
+		if (fd < 0) {
 			fprintf(stderr, "Open %s fail!\n", smbus_dev);
 			exit(-1);
 		}
@@ -633,7 +627,7 @@ int main(int argc, char *argv[]) {
 	pthread_create(&prp_status_thread_id, NULL, prp_status_thread, &prp_mgr);
 
 	if (be_a_daemon) {
-		while ( !bStopping ) {
+		while (!bStopping) {
 			sleep(1);
 		}
 	} else {
