@@ -8,6 +8,8 @@
  *
  * 2017-09-18 Holsety Chen
  *   new release
+ * 2020-03-23 Elvis Yao
+ *   add Fault LED setting
  *
  */
 
@@ -84,6 +86,9 @@ static void *prpmgr_thread(void *arg) {
 		prev_link_i[i] = mgr->devs[i].link_status_i;
 		prev_link_a[i] = mgr->devs[i].link_status_a;
 		prev_link_b[i] = mgr->devs[i].link_status_b;
+
+		/* Enable Fault LED by default */
+		falut_led_enable(fd, 1);
 	}
 
 	sleep(1); /* Wait every thing done... */
@@ -152,6 +157,13 @@ static void *prpmgr_thread(void *arg) {
 				sprintf(str, "%s %d lb %d &", ALARM_EXEC_FILE,
 					i, mgr->devs[i].link_status_b);
 				system(str);
+			}
+
+			/* check link status to enable/disable Falut LED */
+			if (mgr->devs[i].link_status_a && mgr->devs[i].link_status_b) {
+				falut_led_enable(fd, 0);
+			} else {
+				falut_led_enable(fd, 1);
 			}
 		}
 
