@@ -1,3 +1,11 @@
+moxa-hsrprp-tools (1.0.5+deb9) stretch; urgency=low
+
+  * fix: mxhsrprpd update time interval changed to 3 sec
+  * fix: add fault LED control function
+  * style: fix some coding style and usage
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Tue, 24 Mar 2020 10:59:56 +0800
+
 moxa-hsrprp-tools (1.0.4+deb9) stretch; urgency=low
 
   * feat: add support DA-PRP-HSR-I210 for disble copper super isolation
