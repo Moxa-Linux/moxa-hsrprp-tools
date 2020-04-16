@@ -215,6 +215,8 @@ typedef union
 #define SPARE_CONTROL_1			0x02
 #define AUTO_DETECT_MEDIUM		0x1E
 #define MODE_CONTROL			0x1F
+/* Serdes 100BASE-FX Control Register (fiber 100M) */
+#define FIBER_100M_CONTROL		0x13
 
 /* PHY REG 0x18 access */
 #define PHY_ADDR_REG_MII_CONTROL	0x18
@@ -555,6 +557,30 @@ int init_card(int fd, int index)
 	if (read_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, &v) < 0)
 		return -1;
 	v = PHY_REG_1C_WE | PHY_REG_1C(AUTO_DETECT_MEDIUM, v | (1<<8));
+	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
+		return -1;
+
+	/* Enable Serdes 100BASE-FX Control Register Address 1Ch, Shadow 13h */
+	/* bit 2: 1 = Enable Auto-Detect between 100BASE-FX and 1000BASE-X. */
+	/* Fiber LAN A */
+	v = PHY_REG_1C(FIBER_100M_CONTROL, 0);
+	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
+		return -1;
+	if (read_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, &v) < 0)
+		return -1;
+
+	v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
+	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
+		return -1;
+
+	/* Fiber LAN B */
+	v = PHY_REG_1C(FIBER_100M_CONTROL, 0);
+	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
+		return -1;
+	if (read_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, &v) < 0)
+		return -1;
+
+	v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
 	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
 		return -1;
 
