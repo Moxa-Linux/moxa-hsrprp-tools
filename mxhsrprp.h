@@ -69,5 +69,6 @@ int set_prp_mode(int fd, int mode);
 int falut_led_enable(int fd, int enable);
 int get_link_status(int fd, int port, int *status);
 int get_link_speed(int fd, int port, int *speed);
+int set_fiber_speed(int fd, int port, int f_speed);
 
 #endif // _MXHSRPRP_H

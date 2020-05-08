@@ -6,10 +6,10 @@
  *
  * Moxa HSR/PRP Card utility
  *
- * 2017-09-18 Holsety Chen
- *   new release
- * 2020-03-23 Elvis Yao
- *   add Fault LED setting
+ * 2017-09-18	Holsety Chen	new release
+ * 2020-03-23	Elvis Yao	add Fault LED setting
+ * 2020-05-11	Elvis Yao	add setup auto/fixed fiber speed function
+ *
  *
  */
 
@@ -39,6 +39,7 @@ struct mxprpdev {
 	int fd;
 	int mode;
 	int new_mode;
+	int f_speed;
 
 	__u8 fpga_major_version;
 	__u8 fpga_minor_version;
@@ -89,6 +90,10 @@ static void *prpmgr_thread(void *arg) {
 
 		/* Enable Fault LED by default */
 		falut_led_enable(fd, 1);
+
+		/* Setup Fiber speed */
+		set_fiber_speed(fd, PORT_A, mgr->devs[i].f_speed);
+		set_fiber_speed(fd, PORT_B, mgr->devs[i].f_speed);
 	}
 
 	sleep(1); /* Wait every thing done... */
@@ -517,9 +522,17 @@ void usage(void)
 		DEFAULT_PRP_UPDATE_PERIOD_SEC);
 	printf("\t-m: configure to prp or hsr mode, default is prp mode.\n");
 	printf("\t\tThe argurement is [index]:[mode]\n");
-	printf("\t\tindex range from 0~7, mode 0 is prp, mode 1 is hsr.\n");
+	printf("\t\t[index] range from 0~7.\n");
+	printf("\t\t[mode] 0 is prp, mode 1 is hsr.\n");
 	printf("\t\tEx: Set card 0 to hsr mode, card 1 to prp mode.\n");
-	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -m 0:1,1:0");
+	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -m 0:1,1:0\n");
+	printf("\t-s: configure fiber speed, default is auto detect mode.\n");
+	printf("\t\tThe argurement is [index]:[speed]\n");
+	printf("\t\t[index] range from 0~7.\n");
+	printf("\t\t[speed] 0 is auto-detect, speed 1 is 100M, speed 2 is 1000M.\n");
+	printf("\t\tEx: Set card 0 fiber to 100M, card 1 fiber to 1000M.\n");
+	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -s 0:1,1:2");
+
 	printf("\n\n");
 }
 
@@ -527,7 +540,7 @@ int main(int argc, char *argv[]) {
 	int i;
 	int be_a_daemon = 0;
 	char c;
-	char optstring[] = "hBb:t:m:";
+	char optstring[] = "hBb:t:m:s:";
 	char smbus_dev[260] = DEFAULT_SMBUS_DEV_PATH;
 	char str[20];
 	struct mxhsrprp_mgr prp_mgr;
@@ -582,6 +595,32 @@ int main(int argc, char *argv[]) {
 			}
 			}
 			break;
+		case 's':
+			{
+			char params[80];
+			char *p[8];
+			int param_count = 0;
+
+			strcpy(params, optarg);
+			param_count = parsing_string(params, p, ",", 8);
+			for (i = 0; i < param_count; i++) {
+				char *p2[2];
+				if (2 == parsing_string(p[i], p2, ":", 2)) {
+					int idx = atoi(p2[0]);
+					int f_speed = atoi(p2[1]);
+					if ((idx < 0) ||
+					    (idx >= MAX_PRPHSR_CARD) ||
+					    (f_speed < 0) || (f_speed > 2) ) {
+						fprintf(stderr,
+							"Bad argument!\n");
+						exit(-1);
+					}
+					prp_mgr.devs[idx].f_speed = f_speed;
+				}
+			}
+			}
+			break;
+
 		}
 	}
 
