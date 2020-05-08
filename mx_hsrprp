@@ -23,9 +23,17 @@ umask 022
 #   -b: SMBUS device, default is /dev/i2c-0
 #   -m: configure to prp or hsr mode, default is prp mode.
 #       The argurement is [index]:[mode]
-#       index range from 0~7, mode 0 is prp, mode 1 is hsr.
+#       [index] range from 0~7.
+#       [mode] 0 is prp, mode 1 is hsr.
 #       Ex: Set card 0 to hsr mode, card 1 to prp mode.
-#
+#       root@Moxa:~# mxhsrprpd -t 2 -m 0:1,1:0
+#   -s: configure fiber speed, default is auto detect mode.
+#       The argurement is [index]:[speed]
+#       [index] range from 0~7.
+#       [speed] 0 is auto-detect, speed 1 is 100M, speed 2 is 1000M.
+#       Ex: Set card 0 fiber to 100M, card 1 fiber to 1000M.
+#       root@Moxa:~# mxhsrprpd -t 2 -s 0:1,1:2
+
 MX_PRP_OPTS="-t 2 -B"
 
 export PATH="${PATH:+$PATH:}/usr/local/bin:/sbin"
