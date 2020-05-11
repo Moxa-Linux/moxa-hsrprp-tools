@@ -1,3 +1,9 @@
+moxa-hsrprp-tools (1.1.0+deb9) stretch; urgency=low
+
+  * feat: add set fiber speed function
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Mon, 11 May 2020 13:47:45 +0800
+
 moxa-hsrprp-tools (1.0.5+deb9) stretch; urgency=low
 
   * fix: mxhsrprpd update time interval changed to 3 sec
