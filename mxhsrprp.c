@@ -8,6 +8,7 @@
  *
  * 2017-09-18	Holsety Chen	new release
  * 2020-01-02	Elvis Yao	add support DA-PRP-HSR-I210
+ * 2020-05-11	Elvis Yao	add setup auto/fixed fiber speed function
  *
  */
 
@@ -148,6 +149,9 @@ typedef union
 #define CURRENT_SPEED_1000M			1
 #define CURRENT_SPEED_100M			2
 #define CURRENT_SPEED_10M			3
+#define FIBER_SPEED_AUTO			0
+#define FIBER_SPEED_100M			1
+#define FIBER_SPEED_1000M			2
 
 /*
  * Structure of HSR/PRP Configuration Register
@@ -973,6 +977,58 @@ int get_link_speed(int fd, int port, int *speed)
 	} else {
 		return -1;
 	}
+
+	return 0;
+}
+
+int set_fiber_speed(int fd, int port, int f_speed)
+{
+	__u8 phy_addr;
+	__u16 v;
+
+	if (port == PORT_I) {
+		phy_addr = PHY_ADDR_INTERLINK;
+	} else if (port == PORT_A) {
+		phy_addr = PHY_ADDR_LAN_A;
+	} else if (port == PORT_B) {
+		phy_addr = PHY_ADDR_LAN_B;
+	} else {
+		return -1;
+	}
+
+	/* Enable Serdes 100BASE-FX Control Register Address 1Ch, Shadow 13h */
+	/* bit 0: 1 = Enable 100BASE-FX Mode */
+	/* bit 0: 0 = Enable 1000BASE-X Mode */
+	/* bit 2: 1 = Enable Auto-Detect between 100BASE-FX and 1000BASE-X */
+	/* bit 2: 0 = Disable Auto-Detect between 100BASE-FX and 1000BASE-X */
+
+	/* Get current SerDes 100BASE-FX Status Register value */
+        v = PHY_REG_1C(FIBER_100M_CONTROL, 0);
+        if (write_phy_reg(fd, phy_addr, 0x1C, v) < 0)
+                return -1;
+        if (read_phy_reg(fd, phy_addr, 0x1C, &v) < 0)
+                return -1;
+
+	if (f_speed == FIBER_SPEED_AUTO) {
+		/* Enable Fiber Auto-Detect */
+		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
+	} else if (f_speed == FIBER_SPEED_100M) {
+		/* Disable Fiber Auto-Detect */
+		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v & ~(1<<2));
+		/* Enable Enable 100BASE-FX Mode */
+		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | 1);
+	} else if (f_speed == FIBER_SPEED_1000M) {
+		/* Disable Fiber Auto-Detect */
+		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v & ~(1<<2));
+		/* Enable Enable 1000BASE-X Mode */
+		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v & ~1);
+	} else {
+		return -1;
+	}
+
+	/* Set current SerDes 100BASE-FX Status Register value */
+	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
+		return -1;
 
 	return 0;
 }
