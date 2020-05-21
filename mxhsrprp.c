@@ -1026,8 +1026,8 @@ int set_fiber_speed(int fd, int port, int f_speed)
 		return -1;
 	}
 
-	/* Set current SerDes 100BASE-FX Status Register value */
-	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
+	/* Set current SerDes 100BASE-FX Status Register value to PHY port */
+	if (write_phy_reg(fd, phy_addr, 0x1C, v) < 0)
 		return -1;
 
 	return 0;
