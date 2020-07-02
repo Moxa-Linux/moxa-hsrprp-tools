@@ -19,11 +19,11 @@
 #include <net/if.h>
 #include <netinet/ether.h>
 
-#define DEST_MAC0	0x01
-#define DEST_MAC1	0x15
-#define DEST_MAC2	0x4E
+#define DEST_MAC0	0x00
+#define DEST_MAC1	0x90
+#define DEST_MAC2	0xE8
 #define DEST_MAC3	0x00
-#define DEST_MAC4	0x01
+#define DEST_MAC4	0xFB
 #define DEST_MAC5	0x00
 
 #define BUF_SIZE			128
@@ -44,8 +44,8 @@ void usage(void)
 	printf("\t-m: send HSR or PRP supervision frame mode.\
 \n\t    0 is PRP; 1 is HSR. Default is %d.\n", DEFAULT_PRP_MODE);
 	printf("\t-i: interface name, Ex.: eth0 or enp4s0\n");
-	printf("\t-a: Destination MAC address last byte.\
-\n\t    The range is 00~FF. Default is 00\n");
+	printf("\t-a: Destination MAC address last byte. 00:90:e8:00:fb:XX\
+\n\t    The last byte XX range is 00~FF. Default is 00.\n");
 	printf("\n\n");
 }
 

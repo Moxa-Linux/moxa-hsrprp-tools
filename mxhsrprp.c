@@ -385,7 +385,7 @@ int config_port(int fd, __u8 slave_select, int mode)
 		}
 	}
 
-	/* Disable port forwarding */
+	/* Disable port forwarding when init card */
 	if (read_avalon_reg(fd, slave_select, PORT_STATE, &port_state.v) < 0)
 		return -1;
 	port_state.bit.forwarding_state = FORWARDING_STATE_DISABLED;
@@ -393,6 +393,8 @@ int config_port(int fd, __u8 slave_select, int mode)
 		return -1;
 
 	/* HSR/PRP Configuration Register */
+	hsr_cfg.bit.red_intlnk_mode = RED_INTLNK_MODE_REDUNDANT;
+	hsr_cfg.bit.net_id = 0;
 	if (write_avalon_reg(fd, slave_select, HSR_CFG, hsr_cfg.v) < 0)
 		return -1;
 
@@ -403,8 +405,22 @@ int config_port(int fd, __u8 slave_select, int mode)
 			return -1;
 	}
 
-	/* Enable port forwarding */
+	/* Enable port forwarding back */
 	port_state.bit.forwarding_state = FORWARDING_STATE_FORWARDING;
+
+	/* Setup mgmt as normal mode */
+	port_state.bit.management_state = MANAGEMENT_STATE_NORMAL;
+	/* Setup Hardware mode as MII mode */
+	port_state.bit.hw_mode = HW_MODE_MII;
+	/* Setup reserved as 0 */
+	port_state.bit.reserved = 0;
+	/* Setup speed_select as EXTERNAL mode */
+	port_state.bit.speed_select = SPEED_SELECT_EXTERNAL;
+	/* Setup current speed as 0 (read only) */
+	port_state.bit.current_speed = 0;
+	/* Setup reserved2 as 0 */
+	port_state.bit.reserved2 = 0;
+
 	if (write_avalon_reg(fd, slave_select, PORT_STATE, port_state.v) < 0)
 		return -1;
 
