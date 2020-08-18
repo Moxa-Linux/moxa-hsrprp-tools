@@ -552,12 +552,12 @@ int init_card(int fd, int index)
 	#endif
 
 	/* Enable Link Speed LED mode for LAN A */
-	v = PHY_REG_1C_WE | PHY_REG_1C(SPARE_CONTROL_1, (1<<2));
+	v = PHY_REG_1C_WE | PHY_REG_1C(SPARE_CONTROL_1, 0x6);
 	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
 		return -1;
 
 	/* Enable Link Speed LED mode for LAN B */
-	v = PHY_REG_1C_WE | PHY_REG_1C(SPARE_CONTROL_1, (1<<2));
+	v = PHY_REG_1C_WE | PHY_REG_1C(SPARE_CONTROL_1, 0x6);
 	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
 		return -1;
 
