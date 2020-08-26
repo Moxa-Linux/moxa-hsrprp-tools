@@ -149,9 +149,8 @@ typedef union
 #define CURRENT_SPEED_1000M			1
 #define CURRENT_SPEED_100M			2
 #define CURRENT_SPEED_10M			3
-#define FIBER_SPEED_AUTO			0
-#define FIBER_SPEED_100M			1
-#define FIBER_SPEED_1000M			2
+#define FIBER_SPEED_100M			0
+#define FIBER_SPEED_1000M			1
 
 /*
  * Structure of HSR/PRP Configuration Register
@@ -580,30 +579,6 @@ int init_card(int fd, int index)
 	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
 		return -1;
 
-	/* Enable Serdes 100BASE-FX Control Register Address 1Ch, Shadow 13h */
-	/* bit 2: 1 = Enable Auto-Detect between 100BASE-FX and 1000BASE-X. */
-	/* Fiber LAN A */
-	v = PHY_REG_1C(FIBER_100M_CONTROL, 0);
-	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
-		return -1;
-	if (read_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, &v) < 0)
-		return -1;
-
-	v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
-	if (write_phy_reg(fd, PHY_ADDR_LAN_A, 0x1C, v) < 0)
-		return -1;
-
-	/* Fiber LAN B */
-	v = PHY_REG_1C(FIBER_100M_CONTROL, 0);
-	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
-		return -1;
-	if (read_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, &v) < 0)
-		return -1;
-
-	v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
-	if (write_phy_reg(fd, PHY_ADDR_LAN_B, 0x1C, v) < 0)
-		return -1;
-
 	#if 0 /* Dump phy registers for debug*/
 	{
 	unsigned char reg;
@@ -1025,10 +1000,7 @@ int set_fiber_speed(int fd, int port, int f_speed)
         if (read_phy_reg(fd, phy_addr, 0x1C, &v) < 0)
                 return -1;
 
-	if (f_speed == FIBER_SPEED_AUTO) {
-		/* Enable Fiber Auto-Detect */
-		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v | (1<<2));
-	} else if (f_speed == FIBER_SPEED_100M) {
+	if (f_speed == FIBER_SPEED_100M) {
 		/* Disable Fiber Auto-Detect */
 		v = PHY_REG_1C_WE | PHY_REG_1C(FIBER_100M_CONTROL, v & ~(1<<2));
 		/* Enable Enable 100BASE-FX Mode */
