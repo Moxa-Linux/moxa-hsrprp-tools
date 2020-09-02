@@ -31,6 +31,8 @@
 #define DEFAULT_SMBUS_DEV_PATH		"/dev/i2c-0"
 #define PIDFILE				"/var/run/mxhsrprpd.pid"
 #define ALARM_EXEC_FILE			"/usr/sbin/mxprpalarm"
+#define FIBER_SPEED_100M		0
+#define FIBER_SPEED_1000M		1
 
 /* Used to control the daemon running. 0 for running, else for running */
 int bStopping = 0;
@@ -529,9 +531,9 @@ void usage(void)
 	printf("\t-s: configure fiber speed, default is auto detect mode.\n");
 	printf("\t\tThe argurement is [index]:[speed]\n");
 	printf("\t\t[index] range from 0~7.\n");
-	printf("\t\t[speed] 0 is auto-detect, speed 1 is 100M, speed 2 is 1000M.\n");
-	printf("\t\tEx: Set card 0 fiber to 100M, card 1 fiber to 1000M.\n");
-	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -s 0:1,1:2");
+	printf("\t\t[speed] 0 is 100M, 1 is 1000M. (default fiber speed is 1000M)\n");
+	printf("\t\tEx: Set card 0 fiber speed to 100M, card 1 fiber speed to 1000M.\n");
+	printf("\t\troot@Moxa:~# mxhsrprpd -t 2 -s 0:0,1:1");
 
 	printf("\n\n");
 }
@@ -549,6 +551,11 @@ int main(int argc, char *argv[]) {
 
 	memset(&prp_mgr, 0, sizeof(prp_mgr));
 	prp_mgr.polling_sec = DEFAULT_PRP_UPDATE_PERIOD_SEC;
+
+	/* Set default fiber speed */
+	for (i = 0; i < MAX_PRPHSR_CARD; i++) {
+		prp_mgr.devs[i].f_speed = FIBER_SPEED_1000M;
+	}
 
 	while ((c = getopt(argc, argv, optstring)) != -1) {
 		switch (c) {
@@ -610,7 +617,7 @@ int main(int argc, char *argv[]) {
 					int f_speed = atoi(p2[1]);
 					if ((idx < 0) ||
 					    (idx >= MAX_PRPHSR_CARD) ||
-					    (f_speed < 0) || (f_speed > 2) ) {
+					    (f_speed < 0) || (f_speed > 1) ) {
 						fprintf(stderr,
 							"Bad argument!\n");
 						exit(-1);
@@ -620,7 +627,6 @@ int main(int argc, char *argv[]) {
 			}
 			}
 			break;
-
 		}
 	}
 
