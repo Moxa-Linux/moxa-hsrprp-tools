@@ -1,3 +1,10 @@
+moxa-hsrprp-tools (1.1.3+deb9) stretch; urgency=low
+
+  * fix: remove fiber Auto-Detect for Serdes 100BASE-FX Control Register
+  * fix: update link speed LED mode bit[3:0] as 0110
+
+ -- Elvis Yao (姚家瑋) <ElvisCW.Yao@moxa.com>  Thu, 27 Aug 2020 10:42:02 +0800
+
 moxa-hsrprp-tools (1.1.2+deb9) stretch; urgency=low
 
   * fix: add default value for avalon reg
